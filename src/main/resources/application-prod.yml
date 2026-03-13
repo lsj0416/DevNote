@@ -1,0 +1,55 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 10   # 커넥션 풀 최대 크기
+      minimum-idle: 5
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate      # 운영에서는 절대 create / update 금지
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: 6379
+      password: ${REDIS_PASSWORD}
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration: 1800000
+  refresh-token-expiration: 1209600000
+
+openai:
+  api-key: ${OPENAI_API_KEY}
+  note-model: gpt-4o
+  blog-model: gpt-4o-mini
+  timeout: 30000
+
+github:
+  api-base-url: https://api.github.com
+
+aws:
+  region: ap-northeast-2
+  s3:
+    bucket: ${AWS_S3_BUCKET}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+
+oauth2:
+  redirect-uri: ${OAUTH2_REDIRECT_URI}
+
+# 운영 환경 Swagger 비활성화
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+logging:
+  level:
+    com.devnote: INFO
+    org.hibernate.SQL: WARN  # 운영에서는 SQL 로그 최소화

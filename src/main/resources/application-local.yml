@@ -1,0 +1,46 @@
+spring:
+  # Database (로컬 Docker)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/devnote
+    username: devnote
+    password: devnote1234
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update      # 로컬에서만 허용 (엔티티 변경 시 테이블 자동 반영)
+
+  # Redis (로컬 Docker)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+# JWT
+jwt:
+  secret: ${JWT_SECRET:devnote-local-secret-key-must-be-at-least-32-characters}
+  access-token-expiration: 1800000      # 30분 (ms)
+  refresh-token-expiration: 1209600000  # 14일 (ms)
+
+# OpenAI
+openai:
+  api-key: ${OPENAI_API_KEY}
+  note-model: gpt-4o
+  blog-model: gpt-4o-mini
+  timeout: 30000
+
+# GitHub API
+github:
+  api-base-url: https://api.github.com
+
+# AWS S3
+aws:
+  region: ap-northeast-2
+  s3:
+    bucket: ${AWS_S3_BUCKET:devnote-local}
+    access-key: ${AWS_ACCESS_KEY}
+    secret-key: ${AWS_SECRET_KEY}
+
+# OAuth2 로그인 성공 후 리다이렉트 URL
+oauth2:
+  redirect-uri: http://localhost:3000/oauth2/callback
