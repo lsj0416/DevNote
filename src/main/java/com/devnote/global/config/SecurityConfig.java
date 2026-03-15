@@ -5,6 +5,7 @@ import com.devnote.domain.auth.handler.OAuth2SuccessHandler;
 import com.devnote.domain.auth.jwt.JwtAuthFilter;
 import com.devnote.domain.auth.jwt.JwtTokenProvider;
 import com.devnote.domain.auth.service.CustomOAuth2UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,18 +31,24 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/api/v1/auth/refresh",
                                 "/oauth2/**",
                                 "/login/**",
                                 "swagger-ui/**",
-                                "v3/api-docs/**"
+                                "v3/api-docs/**",
+                                "/api-docs/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint((request, response, authException) ->
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                )
                 .oauth2Login(oauth2 -> oauth2
+                        .loginPage("/oauth2/authorization/github")
                         .userInfoEndpoint(userInfo ->
                                 userInfo.userService(customOAuth2UserService))
                         .successHandler(oAuth2SuccessHandler)
