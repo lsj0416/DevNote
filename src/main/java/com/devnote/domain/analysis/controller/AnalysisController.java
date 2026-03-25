@@ -27,7 +27,7 @@ public class AnalysisController {
     @PostMapping
     public ResponseEntity<ApiResponse<JobStatusResponse>> requestAnalysis(
             @Valid @RequestBody AnalysisRequest request) {
-        JobStatusResponse response = analysisService.requestAnalysis(
+        JobStatusResponse response = analysisService.startAnalysis(  // 변경
                 SecurityUtil.getCurrentUserId(), request);
         return ResponseEntity.status(HttpStatus.ACCEPTED)
                 .body(ApiResponse.ok(response));
