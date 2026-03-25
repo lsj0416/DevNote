@@ -67,10 +67,20 @@ public class AnalysisService {
         log.info("분석 Job 생성 완료: jobId={}, userId={}, repoUrl={}",
                 job.getId(), userId, request.getRepoUrl());
 
-        // @Async 비동기 처리 시작
-        analysisJobProcessor.process(job.getId(), user.getGithubToken());
-
         return JobStatusResponse.from(job);
+        // @Async 호출 제거 — 트랜잭션 커밋 전에 호출되면 Job을 찾지 못함
+    }
+
+    // @Async 호출을 트랜잭션 밖으로 분리
+    public JobStatusResponse startAnalysis(Long userId, AnalysisRequest request) {
+        JobStatusResponse response = requestAnalysis(userId, request);
+
+        // requestAnalysis()의 @Transactional이 커밋된 이후에 @Async 호출
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        analysisJobProcessor.process(response.getJobId(), user.getGithubToken());
+
+        return response;
     }
 
     /**
