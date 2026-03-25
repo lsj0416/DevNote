@@ -83,7 +83,7 @@ public class OpenAiNoteClient {
         Map<String, Object> requestBody = Map.of(
                 "model", noteModel,
                 "temperature", temperature,
-                "max_token", 2000,
+                "max_tokens", 2000,
                 "response_format", Map.of("type", "json_object"),   // json_object: OpenAI가 반드시 유효한 JSON만 반환하도록 강제하는 옵션
                 "messages", List.of(
                         Map.of("role", "system", "content", systemPrompt()),
