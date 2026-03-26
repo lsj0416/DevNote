@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final AnalysisJobRepository analysisJobRepository; // 도메인 간 Repository 직접 접근 금지 원칙의 예외 — Note 저장 시 AnalysisJob 참조가 필요하므로 허용
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * AnalysisJobProcessor에서 호출 — OpenAI 응답 데이터를 Note로 저장합니다.
@@ -79,6 +81,12 @@ public class NoteService {
     @Transactional
     public void deleteNote(Long userId, Long noteId) {
         Note note = findByIdAndUserId(noteId, userId);
+
+        // 연관된 Redis 캐시 삭제
+        String cacheKey = "NOTE_CACHE:" + note.getJob().getRepoUrl()
+                + ":" + note.getJob().getCommitSha();
+        redisTemplate.delete(cacheKey);
+
         noteRepository.delete(note);
     }
 
