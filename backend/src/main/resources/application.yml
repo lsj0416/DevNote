@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: local           # 기본 활성 프로파일 -> application-local.yml 로드
+  config:
+    import: optional:file:.env[.properties]   # backend/.env를 로컬 설정 소스로 로드
 
   application:
     name: devnote
