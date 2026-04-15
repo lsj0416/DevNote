@@ -4,7 +4,7 @@
 
 ## Status
 
-프론트엔드는 아직 초기화 전입니다. 현재는 구조와 구현 방향을 먼저 정의한 상태입니다.
+Vite + React + TypeScript 기반 초기화가 완료된 상태입니다. Step 1 기준으로 실행 가능한 최소 앱과 디렉토리 뼈대가 준비되어 있습니다.
 
 기획 문서는 [docs/frontend-plan.md](/Users/sejong/Desktop/Project/devnote/docs/frontend-plan.md)를 참고하세요.
 
@@ -17,17 +17,31 @@
 - 블로그 초안 조회 및 export
 - 계정 설정 화면 제공
 
-## Planned Stack
+## Stack
 
-- React
+- React 19
 - TypeScript
-- Vite
+- Vite 8
 - React Router
 - TanStack Query
 - Zustand 또는 Context API
 - react-hook-form
 - zod
 - react-markdown
+
+## Package Manager
+
+- `npm`
+
+## Getting Started
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+기본 개발 서버는 Vite 기본값을 사용하며 로컬에서 `5173` 포트로 실행됩니다.
 
 ## Planned Routes
 
@@ -47,12 +61,12 @@
 ```text
 frontend/
   src/
-    app/
-    pages/
-    widgets/
-    features/
-    entities/
-    shared/
+    app/        앱 진입점과 전역 구성
+    pages/      라우트 단위 화면
+    widgets/    페이지 조합 컴포넌트
+    features/   사용자 액션 단위 기능
+    entities/   도메인 표현 모델
+    shared/     공용 스타일/유틸/상수
 ```
 
 ## API Integration Notes
@@ -64,10 +78,8 @@ frontend/
 
 ## Next Step
 
-프론트엔드 초기화 시 아래 순서를 권장합니다.
+다음 작업은 workflow 기준 디자인 정교화 또는 설정 화면 확장입니다.
 
-1. Vite + React + TypeScript 프로젝트 생성
-2. 라우터 및 보호 라우트 구성
-3. API 클라이언트 및 인증 저장소 구성
-4. 대시보드와 분석 상태 흐름 구현
-5. 노트 / 블로그 읽기 화면 구현
+1. 노트/블로그 화면의 시각적 완성도 보강
+2. Settings 화면과 사용자 정보 수정 연결
+3. 필요 시 분석 히스토리 목록 구체화
