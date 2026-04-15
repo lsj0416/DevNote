@@ -43,4 +43,4 @@ aws:
 
 # OAuth2 로그인 성공 후 리다이렉트 URL
 oauth2:
-  redirect-uri: http://localhost:3000/oauth2/callback
+  redirect-uri: http://localhost:5173/login/callback
