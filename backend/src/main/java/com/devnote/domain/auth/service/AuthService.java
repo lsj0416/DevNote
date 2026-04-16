@@ -39,10 +39,13 @@ public class AuthService {
         return new TokenResponse(jwtTokenProvider.createAccessToken(userId));
     }
 
-    public void logout(Long userId) {
+    public void logout(Long userId, String refreshToken) {
         String stored = redisTemplate.opsForValue().get(RT_PREFIX + userId);
         if (stored == null) {
             throw new BusinessException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+        }
+        if (!stored.equals(refreshToken)) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
         redisTemplate.delete(RT_PREFIX + userId);
     }

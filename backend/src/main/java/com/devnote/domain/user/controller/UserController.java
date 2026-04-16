@@ -38,6 +38,7 @@ public class UserController {
     @Operation(summary = "회원 탈퇴")
     @DeleteMapping("/me")
     public ResponseEntity<ApiResponse<Void>> deleteMe() {
+        userService.deleteMe(SecurityUtil.getCurrentUserId());
         return ResponseEntity.ok(ApiResponse.ok());
     }
 }
