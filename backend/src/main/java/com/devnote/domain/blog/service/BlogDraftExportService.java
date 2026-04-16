@@ -7,8 +7,14 @@ import com.devnote.global.exception.BusinessException;
 import com.devnote.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
@@ -16,20 +22,36 @@ import org.springframework.transaction.annotation.Transactional;
 public class BlogDraftExportService {
 
     private final BlogDraftRepository blogDraftRepository;
+    private final S3Client s3Client;
 
-    /**
-     * 블로그 초안을 .md 파일로 S3에 업로드하고 다운로드 URL을 반환합니다.
-     * TODO: feature/infra 또는 feature/deploy에서 AWS S3 연동 구현 예정
-     */
+    @Value("${aws.s3.bucket}")
+    private String bucket;
+
     @Transactional
     public BlogExportResponse export(Long userId, Long noteId) {
         BlogDraft draft = blogDraftRepository.findByNoteIdAndUserId(noteId, userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BLOG_DRAFT_NOT_FOUND));
 
-        // TODO: S3 업로드 구현
-        // 1. draft.getContent()를 .md 파일로 변환
-        // 2. S3에 업로드 후 URL 획득
-        // 3. draft.updateExportUrl(url) 저장
-        throw new UnsupportedOperationException("S3 export는 feature/infra에서 구현 예정");
+        String key = "blog-drafts/" + userId + "/" + noteId + ".md";
+        byte[] content = draft.getContent().getBytes(StandardCharsets.UTF_8);
+
+        try {
+            s3Client.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(bucket)
+                            .key(key)
+                            .contentType("text/markdown; charset=utf-8")
+                            .build(),
+                    RequestBody.fromBytes(content));
+        } catch (Exception e) {
+            log.error("[Blog] S3 업로드 실패 - userId={}, noteId={}", userId, noteId, e);
+            throw new BusinessException(ErrorCode.S3_UPLOAD_FAILED);
+        }
+
+        String exportUrl = "https://" + bucket + ".s3.ap-northeast-2.amazonaws.com/" + key;
+        draft.updateExportUrl(exportUrl);
+        log.info("[Blog] S3 export 완료 - userId={}, noteId={}, url={}", userId, noteId, exportUrl);
+
+        return new BlogExportResponse(exportUrl);
     }
 }
