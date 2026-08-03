@@ -62,7 +62,7 @@ ADR-002, ADR-003, ADR-005를 실행 가능한 상태로 만드는 필수 선행 
 |------|------|--------|--------|
 | 2.1 | login-logout-flow-ui | 로그인/로그아웃 UI 플로우 (GitHub 로그인 버튼, 로그인 후 리다이렉트, 로그아웃) | done |
 | 2.2 | user-profile-api-ui | 내 정보 조회/수정 API + 프로필 화면 | done |
-| 2.3 | account-deletion | 회원 탈퇴 API + UI | ready-for-dev |
+| 2.3 | account-deletion | 회원 탈퇴 API + UI | done |
 
 **Cross-epic dependencies:**
 - Blocked by: Epic 1 (Auth.js 설정, DB 스키마)

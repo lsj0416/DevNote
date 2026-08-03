@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getProfile } from "@/lib/domain/user/user-service";
 import { ProfileForm } from "@/components/user/ProfileForm";
+import { DeleteAccountButton } from "@/components/user/DeleteAccountButton";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -24,6 +25,8 @@ export default async function ProfilePage() {
         <dd>{profile.createdAt.toISOString()}</dd>
       </dl>
       <ProfileForm initialUsername={profile.username} />
+      <hr style={{ margin: "2rem 0" }} />
+      <DeleteAccountButton />
     </main>
   );
 }
