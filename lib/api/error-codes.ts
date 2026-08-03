@@ -1,0 +1,27 @@
+export const ErrorCode = {
+  INVALID_REQUEST: "INVALID_REQUEST",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FORBIDDEN: "FORBIDDEN",
+  NOT_FOUND: "NOT_FOUND",
+  DUPLICATE_REQUEST: "DUPLICATE_REQUEST",
+  GITHUB_API_ERROR: "GITHUB_API_ERROR",
+  AI_API_ERROR: "AI_API_ERROR",
+  INTERNAL_ERROR: "INTERNAL_ERROR",
+} as const;
+
+export type ErrorCode = (typeof ErrorCode)[keyof typeof ErrorCode];
+
+export const ERROR_STATUS_MAP: Record<ErrorCode, number> = {
+  INVALID_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  DUPLICATE_REQUEST: 409,
+  GITHUB_API_ERROR: 502,
+  AI_API_ERROR: 502,
+  INTERNAL_ERROR: 500,
+};
+
+export function statusForErrorCode(code: ErrorCode): number {
+  return ERROR_STATUS_MAP[code] ?? ERROR_STATUS_MAP.INTERNAL_ERROR;
+}
