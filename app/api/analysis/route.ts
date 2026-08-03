@@ -5,6 +5,45 @@ import { ErrorCode } from "@/lib/api/error-codes";
 import { isValidGithubRepoUrl } from "@/lib/domain/analysis/validate-repo-url";
 import { createJob, DuplicateJobError } from "@/lib/domain/analysis/analysis-service";
 import { processAnalysisJob } from "@/lib/domain/analysis/job-processor";
+import { prisma } from "@/lib/db";
+
+const DEFAULT_PAGE_SIZE = 10;
+
+export async function GET(request: Request) {
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
+  const url = new URL(request.url);
+  const page = Math.max(0, Number.parseInt(url.searchParams.get("page") ?? "0", 10) || 0);
+  const size = Math.max(
+    1,
+    Number.parseInt(url.searchParams.get("size") ?? `${DEFAULT_PAGE_SIZE}`, 10) ||
+      DEFAULT_PAGE_SIZE
+  );
+
+  const [jobs, totalElements] = await Promise.all([
+    prisma.analysisJob.findMany({
+      where: { userId: guard.userId },
+      orderBy: { createdAt: "desc" },
+      skip: page * size,
+      take: size,
+    }),
+    prisma.analysisJob.count({ where: { userId: guard.userId } }),
+  ]);
+
+  return ok({
+    content: jobs.map((job) => ({
+      jobId: job.id,
+      repoUrl: job.repoUrl,
+      branch: job.branch,
+      status: job.status,
+      createdAt: job.createdAt,
+    })),
+    totalElements,
+    totalPages: Math.ceil(totalElements / size),
+    currentPage: page,
+  });
+}
 
 // Vercel Fluid Compute: allow the background pipeline (waitUntil) up to 300s
 // after the 202 response is returned. See ADR-007.
