@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getNoteById } from "@/lib/domain/note/note-service";
+import { DeleteNoteButton } from "@/components/note/DeleteNoteButton";
 
 export default async function NoteDetailPage({
   params,
@@ -52,6 +53,9 @@ export default async function NoteDetailPage({
 
       <h2>전체 노트</h2>
       <pre style={{ whiteSpace: "pre-wrap", overflowX: "auto" }}>{note.rawMarkdown}</pre>
+
+      <hr style={{ margin: "1.5rem 0" }} />
+      <DeleteNoteButton noteId={note.id} />
     </main>
   );
 }

@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/domain/auth/require-user";
 import { ok, fail } from "@/lib/api/response";
 import { ErrorCode } from "@/lib/api/error-codes";
-import { getNoteById } from "@/lib/domain/note/note-service";
+import { deleteNote, getNoteById } from "@/lib/domain/note/note-service";
 
 export async function GET(
   _request: Request,
@@ -31,4 +31,27 @@ export async function GET(
     rawMarkdown: note.rawMarkdown,
     createdAt: note.createdAt,
   });
+}
+
+export async function DELETE(
+  _request: Request,
+  { params }: { params: Promise<{ noteId: string }> }
+) {
+  const guard = await requireUser();
+  if (!guard.ok) return guard.response;
+
+  const { noteId } = await params;
+  const note = await getNoteById(noteId);
+
+  if (!note) {
+    return fail(ErrorCode.NOT_FOUND, "노트를 찾을 수 없습니다.");
+  }
+
+  if (note.userId !== guard.userId) {
+    return fail(ErrorCode.FORBIDDEN, "본인 소유의 노트만 삭제할 수 있습니다.");
+  }
+
+  await deleteNote(noteId);
+
+  return ok({ deleted: true });
 }
