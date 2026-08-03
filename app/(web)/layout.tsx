@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { auth } from "@/lib/auth";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -29,10 +30,12 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
-        <nav style={{ display: "flex", justifyContent: "flex-end", padding: "1rem" }}>
-          {session?.user && <LogoutButton />}
-        </nav>
-        {children}
+        <QueryProvider>
+          <nav style={{ display: "flex", justifyContent: "flex-end", padding: "1rem" }}>
+            {session?.user && <LogoutButton />}
+          </nav>
+          {children}
+        </QueryProvider>
       </body>
     </html>
   );
