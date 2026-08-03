@@ -30,7 +30,7 @@ ADR-002, ADR-003, ADR-005를 실행 가능한 상태로 만드는 필수 선행 
 | ID | Slug | Intent | Status |
 |------|------|--------|--------|
 | 1.1 | nextjs-project-init | Next.js(App Router) 프로젝트 초기화 및 Vercel 배포 연결 | done |
-| 1.2 | prisma-neon-setup | Prisma 스키마(User/AnalysisJob/Note/BlogDraft) 정의 + Neon 연결 + 마이그레이션 | ready-for-dev |
+| 1.2 | prisma-neon-setup | Prisma 스키마(User/AnalysisJob/Note/BlogDraft) 정의 + Neon 연결 + 마이그레이션 | done |
 | 1.3 | authjs-github-oauth-setup | Auth.js 설정: GitHub Provider, Prisma Adapter, JWT 세션, github_token 암호화 저장 | ready-for-dev |
 | 1.4 | common-api-envelope-authguard | 공통 API 응답 엔벨로프 유틸 + 인증 가드(auth 세션 체크) 헬퍼 | ready-for-dev |
 
