@@ -53,3 +53,11 @@ export async function listNotes(userId: string, page: number, size: number) {
 export function getNoteById(noteId: string) {
   return prisma.note.findUnique({ where: { id: noteId } });
 }
+
+/**
+ * Deletes a note. Its BlogDraft (if any) is removed automatically via
+ * `onDelete: Cascade` on BlogDraft.note (set in 1.2) — no BlogDraft is fine too.
+ */
+export function deleteNote(noteId: string) {
+  return prisma.note.delete({ where: { id: noteId } });
+}
