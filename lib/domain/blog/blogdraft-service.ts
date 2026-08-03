@@ -21,3 +21,7 @@ export async function createBlogDraftFromNote(
 
   return created.id;
 }
+
+export function getBlogDraftByNoteId(noteId: string) {
+  return prisma.blogDraft.findUnique({ where: { noteId } });
+}
