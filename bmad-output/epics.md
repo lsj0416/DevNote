@@ -94,7 +94,7 @@ ADR-009(수집 범위 제한/캐싱) [Source: architecture.md#component-analysis
 
 | ID | Slug | Intent | Status |
 |------|------|--------|--------|
-| 3.1 | analysis-request-api | 분석 Job 생성 API (POST /api/analysis, PENDING 상태 생성) | ready-for-dev |
+| 3.1 | analysis-request-api | 분석 Job 생성 API (POST /api/analysis, PENDING 상태 생성) | done |
 | 3.2 | github-data-collector | GitHub 데이터 수집 클라이언트 (README+디렉토리+커밋 최신 50개+PR 최근 20개) | ready-for-dev |
 | 3.3 | analysis-job-pipeline | Job 처리 파이프라인 (waitUntil, 상태 전이 PROCESSING→COMPLETED/FAILED, 커밋 SHA 캐싱) | ready-for-dev |
 | 3.4 | analysis-status-polling | 분석 상태 조회 API + 폴링 UI (TanStack Query) | ready-for-dev |
