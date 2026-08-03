@@ -22,3 +22,34 @@ export async function createNoteFromAnalysis(
 
   return created.id;
 }
+
+const NOTE_LIST_SELECT = {
+  id: true,
+  title: true,
+  summary: true,
+  createdAt: true,
+} as const;
+
+export async function listNotes(userId: string, page: number, size: number) {
+  const [content, totalElements] = await Promise.all([
+    prisma.note.findMany({
+      where: { userId },
+      orderBy: { createdAt: "desc" },
+      skip: page * size,
+      take: size,
+      select: NOTE_LIST_SELECT,
+    }),
+    prisma.note.count({ where: { userId } }),
+  ]);
+
+  return {
+    content,
+    totalElements,
+    totalPages: Math.ceil(totalElements / size),
+    currentPage: page,
+  };
+}
+
+export function getNoteById(noteId: string) {
+  return prisma.note.findUnique({ where: { id: noteId } });
+}
