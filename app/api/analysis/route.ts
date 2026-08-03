@@ -1,8 +1,14 @@
+import { waitUntil } from "@vercel/functions";
 import { requireUser } from "@/lib/domain/auth/require-user";
 import { ok, fail } from "@/lib/api/response";
 import { ErrorCode } from "@/lib/api/error-codes";
 import { isValidGithubRepoUrl } from "@/lib/domain/analysis/validate-repo-url";
 import { createJob, DuplicateJobError } from "@/lib/domain/analysis/analysis-service";
+import { processAnalysisJob } from "@/lib/domain/analysis/job-processor";
+
+// Vercel Fluid Compute: allow the background pipeline (waitUntil) up to 300s
+// after the 202 response is returned. See ADR-007.
+export const maxDuration = 300;
 
 export async function POST(request: Request) {
   const guard = await requireUser();
@@ -18,6 +24,7 @@ export async function POST(request: Request) {
 
   try {
     const job = await createJob(guard.userId, repoUrl, branch);
+    waitUntil(processAnalysisJob(job.id));
     return ok(
       {
         jobId: job.id,
