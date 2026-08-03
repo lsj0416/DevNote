@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum JobStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  githubId     String   @unique @map("github_id")
+  username     String
+  email        String?
+  profileImage String?  @map("profile_image")
+  githubToken  String?  @map("github_token")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  analysisJobs AnalysisJob[]
+  notes        Note[]
+  blogDrafts   BlogDraft[]
+
+  @@map("users")
+}
+
+model AnalysisJob {
+  id           String    @id @default(cuid())
+  userId       String    @map("user_id")
+  repoUrl      String    @map("repo_url")
+  repoName     String    @map("repo_name")
+  branch       String
+  commitSha    String?   @map("commit_sha")
+  status       JobStatus @default(PENDING)
+  errorMessage String?   @map("error_message")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note Note?
+
+  @@index([userId])
+  @@index([status])
+  @@index([repoUrl, commitSha])
+  @@map("analysis_jobs")
+}
+
+model Note {
+  id             String   @id @default(cuid())
+  userId         String   @map("user_id")
+  jobId          String   @unique @map("job_id")
+  title          String
+  summary        String
+  concepts       Json
+  architecture   String?
+  learningPoints Json     @map("learning_points")
+  rawMarkdown    String   @map("raw_markdown")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job       AnalysisJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  blogDraft BlogDraft?
+
+  @@index([userId])
+  @@map("notes")
+}
+
+model BlogDraft {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  noteId    String   @unique @map("note_id")
+  title     String
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  note Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+
+  @@map("blog_drafts")
+}
