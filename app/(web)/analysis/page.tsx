@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { AnalysisList } from "@/components/analysis/AnalysisList";
+import { AnalysisRequestForm } from "@/components/analysis/AnalysisRequestForm";
 
 export default async function AnalysisPage() {
   const session = await auth();
@@ -18,6 +19,8 @@ export default async function AnalysisPage() {
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1rem" }}>
       <h1>내 분석</h1>
+      <AnalysisRequestForm />
+      <hr style={{ margin: "1.5rem 0" }} />
       <AnalysisList
         jobs={jobs.map((job) => ({
           jobId: job.id,
