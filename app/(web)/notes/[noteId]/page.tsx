@@ -1,7 +1,9 @@
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getNoteById } from "@/lib/domain/note/note-service";
+import { getBlogDraftByNoteId } from "@/lib/domain/blog/blogdraft-service";
 import { DeleteNoteButton } from "@/components/note/DeleteNoteButton";
+import { BlogDraftSection } from "@/components/blog/BlogDraftSection";
 
 export default async function NoteDetailPage({
   params,
@@ -24,6 +26,7 @@ export default async function NoteDetailPage({
   const learningPoints = Array.isArray(note.learningPoints)
     ? (note.learningPoints as string[])
     : [];
+  const blogDraft = await getBlogDraftByNoteId(note.id);
 
   return (
     <main style={{ maxWidth: 720, margin: "0 auto", padding: "2rem 1rem" }}>
@@ -53,6 +56,11 @@ export default async function NoteDetailPage({
 
       <h2>전체 노트</h2>
       <pre style={{ whiteSpace: "pre-wrap", overflowX: "auto" }}>{note.rawMarkdown}</pre>
+
+      <hr style={{ margin: "1.5rem 0" }} />
+      <BlogDraftSection
+        draft={blogDraft ? { title: blogDraft.title, content: blogDraft.content } : null}
+      />
 
       <hr style={{ margin: "1.5rem 0" }} />
       <DeleteNoteButton noteId={note.id} />
