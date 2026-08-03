@@ -126,7 +126,7 @@ ADR-009(수집 범위 제한/캐싱) [Source: architecture.md#component-analysis
 
 | ID | Slug | Intent | Status |
 |------|------|--------|--------|
-| 4.1 | ai-note-generation | AI 학습 노트 생성 로직 (OpenAI 프롬프트, Job 파이프라인 연동) | ready-for-dev |
+| 4.1 | ai-note-generation | AI 학습 노트 생성 로직 (OpenAI 프롬프트, Job 파이프라인 연동) | done |
 | 4.2 | note-list-detail-api-ui | 노트 목록/상세 조회 API + 화면 | ready-for-dev |
 | 4.3 | note-deletion | 노트 삭제 API + UI (연관 블로그 초안 연쇄 삭제) | ready-for-dev |
 
