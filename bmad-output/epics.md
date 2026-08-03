@@ -99,7 +99,7 @@ ADR-009(수집 범위 제한/캐싱) [Source: architecture.md#component-analysis
 | 3.3 | analysis-job-pipeline | Job 처리 파이프라인 (waitUntil, 상태 전이 PROCESSING→COMPLETED/FAILED, 커밋 SHA 캐싱) | done |
 | 3.4 | analysis-status-polling | 분석 상태 조회 API + 폴링 UI (TanStack Query) | done |
 | 3.5 | analysis-list-api-ui | 내 분석 목록 조회 API + 목록 화면 | done |
-| 3.6 | analysis-request-ui | repo URL/브랜치 입력 폼 UI | ready-for-dev |
+| 3.6 | analysis-request-ui | repo URL/브랜치 입력 폼 UI | done |
 
 **Cross-epic dependencies:**
 - Blocked by: Epic 1 (DB/인증), Epic 2 (로그인된 사용자 필요), **4.1과 5.1(스토리 3.3이 호출하는

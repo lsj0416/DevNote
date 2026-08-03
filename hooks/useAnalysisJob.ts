@@ -32,10 +32,11 @@ async function fetchAnalysisJob(jobId: string): Promise<AnalysisJobStatusRespons
 }
 
 /** Polls `GET /api/analysis/{jobId}` until the job reaches a terminal status. */
-export function useAnalysisJob(jobId: string) {
+export function useAnalysisJob(jobId: string, options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["analysis-job", jobId],
     queryFn: () => fetchAnalysisJob(jobId),
+    enabled: (options?.enabled ?? true) && jobId.length > 0,
     refetchInterval: (query: Query<AnalysisJobStatusResponse>) => {
       const data = query.state.data;
       if (data && isTerminalStatus(data.status)) {
