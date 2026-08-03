@@ -59,6 +59,7 @@ export default async function NoteDetailPage({
 
       <hr style={{ margin: "1.5rem 0" }} />
       <BlogDraftSection
+        noteId={note.id}
         draft={blogDraft ? { title: blogDraft.title, content: blogDraft.content } : null}
       />
 
