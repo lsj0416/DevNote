@@ -155,7 +155,7 @@ ADR-009(수집 범위 제한/캐싱) [Source: architecture.md#component-analysis
 
 | ID | Slug | Intent | Status |
 |------|------|--------|--------|
-| 5.1 | ai-blogdraft-generation | AI 블로그 초안 생성 로직 (노트 생성 파이프라인과 연동) | ready-for-dev |
+| 5.1 | ai-blogdraft-generation | AI 블로그 초안 생성 로직 (노트 생성 파이프라인과 연동) | done |
 | 5.2 | blogdraft-view-api-ui | 블로그 초안 조회 API + 화면 | ready-for-dev |
 | 5.3 | blogdraft-markdown-export | Markdown export 다운로드 라우트 (DB content 스트리밍) | ready-for-dev |
 
