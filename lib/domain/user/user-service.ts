@@ -21,3 +21,11 @@ export function updateUsername(userId: string, username: string) {
     select: PROFILE_SELECT,
   });
 }
+
+/**
+ * Deletes a user account. AnalysisJob/Note/BlogDraft/Account/Session rows are
+ * removed automatically via `onDelete: Cascade` on their User relations.
+ */
+export function deleteAccount(userId: string) {
+  return prisma.user.delete({ where: { id: userId } });
+}

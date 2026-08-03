@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { prisma } from "@/lib/db";
-import { getProfile, updateUsername } from "@/lib/domain/user/user-service";
+import { deleteAccount, getProfile, updateUsername } from "@/lib/domain/user/user-service";
 
 const createdUserIds: string[] = [];
 
@@ -38,5 +38,15 @@ describe("user-service (profile)", () => {
 
     const reloaded = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
     expect(reloaded.username).toBe("new-name");
+  });
+
+  it("deleteAccount removes the user row", async () => {
+    const user = await prisma.user.create({
+      data: { githubId: `profile-del-${Date.now()}`, username: "delete-me" },
+    });
+
+    await deleteAccount(user.id);
+
+    expect(await prisma.user.findUnique({ where: { id: user.id } })).toBeNull();
   });
 });
