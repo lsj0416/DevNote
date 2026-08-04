@@ -5,6 +5,7 @@ const reposGet = vi.fn();
 const reposGetReadme = vi.fn();
 const reposGetContent = vi.fn();
 const reposListCommits = vi.fn();
+const reposListBranches = vi.fn();
 const pullsList = vi.fn();
 
 vi.mock("octokit", () => ({
@@ -16,6 +17,7 @@ vi.mock("octokit", () => ({
           getReadme: reposGetReadme,
           getContent: reposGetContent,
           listCommits: reposListCommits,
+          listBranches: reposListBranches,
         },
         pulls: {
           list: pullsList,
@@ -32,6 +34,7 @@ beforeEach(() => {
   reposGetReadme.mockReset();
   reposGetContent.mockReset();
   reposListCommits.mockReset();
+  reposListBranches.mockReset();
   pullsList.mockReset();
 });
 
@@ -151,5 +154,30 @@ describe("github-client", () => {
       expect(error).toBeInstanceOf(GithubApiError);
       expect((error as InstanceType<typeof GithubApiError>).status).toBe(403);
     }
+  });
+
+  it("getRepoBranches returns branch names and the default branch", async () => {
+    reposGet.mockResolvedValue({ data: { default_branch: "main" } });
+    reposListBranches.mockResolvedValue({
+      data: [{ name: "main" }, { name: "develop" }, { name: "feature/x" }],
+    });
+    const { getRepoBranches } = await import("@/lib/domain/analysis/github-client");
+
+    const result = await getRepoBranches(token, "a", "b");
+
+    expect(result).toEqual({
+      branches: ["main", "develop", "feature/x"],
+      defaultBranch: "main",
+    });
+  });
+
+  it("getRepoBranches throws GithubApiError on failure", async () => {
+    reposGet.mockResolvedValue({ data: { default_branch: "main" } });
+    reposListBranches.mockRejectedValue({ status: 404 });
+    const { getRepoBranches, GithubApiError } = await import(
+      "@/lib/domain/analysis/github-client"
+    );
+
+    await expect(getRepoBranches(token, "a", "b")).rejects.toBeInstanceOf(GithubApiError);
   });
 });

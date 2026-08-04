@@ -1,10 +1,29 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState, type FormEvent } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useAnalysisJob } from "@/hooks/useAnalysisJob";
 import { JobStatusBadge } from "@/components/analysis/JobStatusBadge";
+import { isValidGithubRepoUrl } from "@/lib/domain/analysis/validate-repo-url";
+
+const BRANCH_LOOKUP_DEBOUNCE_MS = 500;
+
+interface RepoBranches {
+  branches: string[];
+  defaultBranch: string;
+}
+
+async function fetchBranches(repoUrl: string): Promise<RepoBranches> {
+  const res = await fetch(`/api/analysis/branches?repoUrl=${encodeURIComponent(repoUrl)}`);
+  const body = await res.json();
+
+  if (!res.ok || !body.success) {
+    throw new Error(body.message ?? "브랜치 목록을 가져오지 못했습니다.");
+  }
+
+  return body.data;
+}
 
 interface CreateJobResponse {
   jobId: string;
@@ -57,7 +76,31 @@ export function AnalysisRequestForm() {
   const router = useRouter();
   const [repoUrl, setRepoUrl] = useState("");
   const [branch, setBranch] = useState("");
+  const [debouncedRepoUrl, setDebouncedRepoUrl] = useState("");
   const [submittedJobId, setSubmittedJobId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handle = setTimeout(() => setDebouncedRepoUrl(repoUrl.trim()), BRANCH_LOOKUP_DEBOUNCE_MS);
+    return () => clearTimeout(handle);
+  }, [repoUrl]);
+
+  const branchesQuery = useQuery({
+    queryKey: ["analysis-branches", debouncedRepoUrl],
+    queryFn: () => fetchBranches(debouncedRepoUrl),
+    enabled: isValidGithubRepoUrl(debouncedRepoUrl),
+    retry: false,
+  });
+
+  // Adjusting state during render (see https://react.dev/learn/you-might-not-need-an-effect):
+  // reset the branch choice whenever the repo URL changes, and once branches load for the
+  // current repo, default-select the repo's default branch if nothing has been chosen yet.
+  const [trackedRepoUrl, setTrackedRepoUrl] = useState(debouncedRepoUrl);
+  if (debouncedRepoUrl !== trackedRepoUrl) {
+    setTrackedRepoUrl(debouncedRepoUrl);
+    setBranch("");
+  } else if (branchesQuery.data?.defaultBranch && !branch) {
+    setBranch(branchesQuery.data.defaultBranch);
+  }
 
   const mutation = useMutation({
     mutationFn: requestAnalysis,
@@ -93,12 +136,24 @@ export function AnalysisRequestForm() {
         </label>
         <label>
           Branch (선택)
-          <input
-            type="text"
-            value={branch}
-            onChange={(event) => setBranch(event.target.value)}
-            placeholder="main"
-          />
+          {branchesQuery.data && Array.isArray(branchesQuery.data.branches) ? (
+            <select value={branch} onChange={(event) => setBranch(event.target.value)}>
+              {branchesQuery.data.branches.map((branchName) => (
+                <option key={branchName} value={branchName}>
+                  {branchName}
+                  {branchName === branchesQuery.data?.defaultBranch ? " (기본)" : ""}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <input
+              type="text"
+              value={branch}
+              onChange={(event) => setBranch(event.target.value)}
+              placeholder="main"
+            />
+          )}
+          {branchesQuery.isFetching && <span> 브랜치 조회 중...</span>}
         </label>
         <button type="submit" disabled={mutation.isPending}>
           분석 요청

@@ -3,6 +3,7 @@ import { decrypt } from "@/lib/domain/auth/encryption";
 
 const MAX_COMMITS = 50;
 const MAX_PULL_REQUESTS = 20;
+const MAX_BRANCHES = 100;
 
 export class GithubApiError extends Error {
   readonly status?: number;
@@ -47,6 +48,32 @@ export async function getDefaultBranch(
     return data.default_branch;
   } catch (error) {
     throw wrapError(error, `Failed to fetch default branch for ${owner}/${repo}`);
+  }
+}
+
+export interface RepoBranches {
+  branches: string[];
+  defaultBranch: string;
+}
+
+/** Fetches up to 100 branch names and the repo's default branch, for a branch picker UI. */
+export async function getRepoBranches(
+  encryptedAccessToken: string,
+  owner: string,
+  repo: string
+): Promise<RepoBranches> {
+  const octokit = createOctokit(encryptedAccessToken);
+  try {
+    const [{ data: repoData }, { data: branchesData }] = await Promise.all([
+      octokit.rest.repos.get({ owner, repo }),
+      octokit.rest.repos.listBranches({ owner, repo, per_page: MAX_BRANCHES }),
+    ]);
+    return {
+      branches: branchesData.map((branch) => branch.name),
+      defaultBranch: repoData.default_branch,
+    };
+  } catch (error) {
+    throw wrapError(error, `Failed to fetch branches for ${owner}/${repo}`);
   }
 }
 

@@ -93,6 +93,31 @@ describe("AnalysisRequestForm", () => {
     );
   });
 
+  it("switches to a branch dropdown once branches are fetched for a valid repo URL", async () => {
+    const fetchMock = vi.mocked(fetch);
+    fetchMock.mockImplementation(async (input) => {
+      const url = String(input);
+      if (url.includes("/api/analysis/branches")) {
+        return jsonResponse(200, {
+          success: true,
+          message: "OK",
+          data: { branches: ["main", "develop"], defaultBranch: "main" },
+        });
+      }
+      return jsonResponse(404, { success: false, message: "not found", code: "NOT_FOUND" });
+    });
+
+    const user = userEvent.setup();
+    renderForm();
+
+    await user.type(screen.getByPlaceholderText("https://github.com/owner/repo"), "https://github.com/a/b");
+
+    const select = await screen.findByRole("combobox", {}, { timeout: 2000 });
+    expect(select).toBeTruthy();
+    expect(screen.getByText("main (기본)")).toBeTruthy();
+    expect(screen.getByText("develop")).toBeTruthy();
+  });
+
   it("shows a duplicate-request message on a 409 response", async () => {
     const fetchMock = vi.mocked(fetch);
     fetchMock.mockResolvedValue(
